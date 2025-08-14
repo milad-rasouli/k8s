@@ -1,0 +1,7 @@
+server = "http://192.168.59.11:5000"
+
+[host."http://192.168.59.11:5000"]
+  capabilities = ["pull", "resolve"]
+  # Allow plain HTTP access rather than TLS
+  # plain_http is the special flag containerd understands in hosts.toml
+  plain_http = true

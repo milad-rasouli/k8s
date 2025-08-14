@@ -4,46 +4,80 @@ metadata:
   name: k0s-cluster
   user: admin
 spec:
+  # k0s version to install
+  k0s:
+    version: v1.32.4+k0s.0
+
+    # k0s cluster config (k0s config that will be installed on the controller)
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: Cluster
+      metadata:
+        name: local-k0s
+      spec:
+        api:
+          # Control external address is controller node IP
+          externalAddress: 192.168.59.10
+          k0sApiPort: 9443
+          port: 6443
+        network:
+          provider: kuberouter
+          kubeProxy:
+            disabled: false
+            mode: iptables
+          # Pod and service networks per your request
+          podCIDR: 172.17.1.0/24
+          serviceCIDR: 172.16.0.0/12
+        storage:
+          type: etcd
+        telemetry:
+          enabled: true
+
   hosts:
   - ssh:
       address: 192.168.59.10
       user: root
       port: 22
-      keyPath: ~/.ssh/id_rsa
     role: controller
+    hostname: control1
+    privateAddress: 192.168.59.10 # avoid using NAT interface
+    # upload prepared containerd + registry files to the controller
+    files:
+    - name: containerd config
+      src: ./resources/etc/k0s/containerd/containerd.toml
+      dstDir: /etc/k0s/
+    - name: containerd certs.d for nexus registry
+      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
   - ssh:
       address: 192.168.59.22
       user: root
       port: 22
-      keyPath: ~/.ssh/id_rsa
     role: worker
-  options:
-    wait:
-      enabled: true
-    drain:
-      enabled: true
-      gracePeriod: 2m0s
-      timeout: 5m0s
-      force: true
-      ignoreDaemonSets: true
-      deleteEmptyDirData: true
-      podSelector: ""
-      skipWaitForDeleteTimeout: 0s
-    concurrency:
-      limit: 30
-      workerDisruptionPercent: 10
-      uploads: 5
-    evictTaint:
-      enabled: false
-      taint: k0sctl.k0sproject.io/evict=true
-      effect: NoExecute
-      controllerWorkers: false
+    hostname: worker1
+    privateAddress: 192.168.59.22 # avoid using NAT interface
+    files:
+    - name: containerd config
+      src: ./resources/etc/k0s/containerd/containerd.toml
+      dstDir: /etc/k0s/
+    - name: containerd certs.d for nexus registry
+      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
   - ssh:
       address: 192.168.59.21
       user: root
       port: 22
-      keyPath: ~/.ssh/id_rsa
     role: worker
+    hostname: worker2
+    privateAddress: 192.168.59.21 # avoid using NAT interface
+    files:
+    - name: containerd config
+      src: ./resources/etc/k0s/containerd/containerd.toml
+      dstDir: /etc/k0s/
+    - name: containerd certs.d for nexus registry
+      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+
   options:
     wait:
       enabled: true
