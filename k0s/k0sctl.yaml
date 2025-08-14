@@ -4,11 +4,8 @@ metadata:
   name: k0s-cluster
   user: admin
 spec:
-  # k0s version to install
   k0s:
-    version: v1.32.4+k0s.0
-
-    # k0s cluster config (k0s config that will be installed on the controller)
+    version: v1.33.3+k0s.0
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
       kind: Cluster
@@ -16,8 +13,10 @@ spec:
         name: local-k0s
       spec:
         api:
-          # Control external address is controller node IP
           externalAddress: 192.168.59.10
+          address: 192.168.59.10
+          sans:
+            - 192.168.59.10
           k0sApiPort: 9443
           port: 6443
         network:
@@ -25,7 +24,6 @@ spec:
           kubeProxy:
             disabled: false
             mode: iptables
-          # Pod and service networks per your request
           podCIDR: 172.17.1.0/24
           serviceCIDR: 172.16.0.0/12
         storage:
@@ -38,45 +36,88 @@ spec:
       address: 192.168.59.10
       user: root
       port: 22
+      keyPath: ~/.ssh/id_rsa
     role: controller
     hostname: control1
-    privateAddress: 192.168.59.10 # avoid using NAT interface
-    # upload prepared containerd + registry files to the controller
+    privateAddress: 192.168.59.10
     files:
-    - name: containerd config
-      src: ./resources/etc/k0s/containerd/containerd.toml
-      dstDir: /etc/k0s/
-    - name: containerd certs.d for nexus registry
-      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd config
+        src: ./resources/etc/k0s/containerd/containerd.toml
+        dstDir: /etc/k0s/
+      - name: containerd certs.d for nexus registry
+        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: sysctl defaults for k8s
+        src: ./resources/etc/sysctl.d/99-k8s.conf
+        dstDir: /etc/sysctl.d/
+    hooks:
+      prepare:
+        before:
+          - /sbin/modprobe br_netfilter || true
+          - /sbin/sysctl --system || true
+          - systemctl daemon-reload || true
+          - systemctl enable --now k0scontroller || systemctl enable --now k0s || true
+          - systemctl start k0scontroller || systemctl start k0s || true
+          - sleep 2
+          - systemctl status k0scontroller --no-pager -l || systemctl status k0s --no-pager -l || true
+
   - ssh:
       address: 192.168.59.22
       user: root
       port: 22
+      keyPath: ~/.ssh/id_rsa
     role: worker
     hostname: worker1
-    privateAddress: 192.168.59.22 # avoid using NAT interface
+    privateAddress: 192.168.59.22
     files:
-    - name: containerd config
-      src: ./resources/etc/k0s/containerd/containerd.toml
-      dstDir: /etc/k0s/
-    - name: containerd certs.d for nexus registry
-      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd config
+        src: ./resources/etc/k0s/containerd/containerd.toml
+        dstDir: /etc/k0s/
+      - name: containerd certs.d for nexus registry
+        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: sysctl defaults for k8s
+        src: ./resources/etc/sysctl.d/99-k8s.conf
+        dstDir: /etc/sysctl.d/
+    hooks:
+      prepare:
+        before:
+          - /sbin/modprobe br_netfilter || true
+          - /sbin/sysctl --system || true
+          - systemctl daemon-reload || true
+          - systemctl enable --now k0sworker || systemctl enable --now k0s || true
+          - systemctl start k0sworker || systemctl start k0s || true
+          - sleep 2
+          - systemctl status k0sworker --no-pager -l || systemctl status k0s --no-pager -l || true
+
   - ssh:
       address: 192.168.59.21
       user: root
       port: 22
+      keyPath: ~/.ssh/id_rsa
     role: worker
     hostname: worker2
-    privateAddress: 192.168.59.21 # avoid using NAT interface
+    privateAddress: 192.168.59.21
     files:
-    - name: containerd config
-      src: ./resources/etc/k0s/containerd/containerd.toml
-      dstDir: /etc/k0s/
-    - name: containerd certs.d for nexus registry
-      src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-      dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd config
+        src: ./resources/etc/k0s/containerd/containerd.toml
+        dstDir: /etc/k0s/
+      - name: containerd certs.d for nexus registry
+        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: sysctl defaults for k8s
+        src: ./resources/etc/sysctl.d/99-k8s.conf
+        dstDir: /etc/sysctl.d/
+    hooks:
+      prepare:
+        before:
+          - /sbin/modprobe br_netfilter || true
+          - /sbin/sysctl --system || true
+          - systemctl daemon-reload || true
+          - systemctl enable --now k0sworker || systemctl enable --now k0s || true
+          - systemctl start k0sworker || systemctl start k0s || true
+          - sleep 2
+          - systemctl status k0sworker --no-pager -l || systemctl status k0s --no-pager -l || true
 
   options:
     wait:
@@ -91,11 +132,12 @@ spec:
       podSelector: ""
       skipWaitForDeleteTimeout: 0s
     concurrency:
-      limit: 30
+      limit: 10
       workerDisruptionPercent: 10
-      uploads: 5
+      uploads: 3
     evictTaint:
       enabled: false
       taint: k0sctl.k0sproject.io/evict=true
       effect: NoExecute
       controllerWorkers: false
+
