@@ -44,9 +44,9 @@ spec:
       - name: containerd config
         src: ./resources/etc/k0s/containerd/containerd.toml
         dstDir: /etc/k0s/
-      - name: containerd certs.d for nexus registry
-        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd registry hosts for docker.io
+        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/docker.io
       - name: sysctl defaults for k8s
         src: ./resources/etc/sysctl.d/99-k8s.conf
         dstDir: /etc/sysctl.d/
@@ -73,9 +73,9 @@ spec:
       - name: containerd config
         src: ./resources/etc/k0s/containerd/containerd.toml
         dstDir: /etc/k0s/
-      - name: containerd certs.d for nexus registry
-        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd registry hosts for docker.io
+        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/docker.io
       - name: sysctl defaults for k8s
         src: ./resources/etc/sysctl.d/99-k8s.conf
         dstDir: /etc/sysctl.d/
@@ -102,9 +102,9 @@ spec:
       - name: containerd config
         src: ./resources/etc/k0s/containerd/containerd.toml
         dstDir: /etc/k0s/
-      - name: containerd certs.d for nexus registry
-        src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/192.168.59.11:5000
+      - name: containerd registry hosts for docker.io
+        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
+        dstDir: /etc/k0s/containerd/certs.d/docker.io
       - name: sysctl defaults for k8s
         src: ./resources/etc/sysctl.d/99-k8s.conf
         dstDir: /etc/sysctl.d/
@@ -140,4 +140,3 @@ spec:
       taint: k0sctl.k0sproject.io/evict=true
       effect: NoExecute
       controllerWorkers: false
-

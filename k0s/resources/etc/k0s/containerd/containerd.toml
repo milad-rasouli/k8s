@@ -1,9 +1,9 @@
-root = "/var/lib/containerd"
-state = "/run/containerd"
+root = "/var/lib/k0s/containerd"
+state = "/run/k0s/containerd"
 version = 2
 
 [grpc]
-  address = "/var/lib/k0s/run/containerd.sock"
+  address = "/run/k0s/containerd.sock"
 
 [plugins."io.containerd.grpc.v1.cri"]
   sandbox_image = "registry.k8s.io/pause:3.8"
@@ -18,13 +18,5 @@ version = 2
     snapshotter = "overlayfs"
 
   [plugins."io.containerd.grpc.v1.cri".registry]
-    # where per-host hosts.toml are expected
+    # Per-host registry configuration (hosts.toml files) live under this path
     config_path = "/etc/k0s/containerd/certs.d"
-
-  [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
-      endpoint = ["http://192.168.59.11:5000"]
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."registry.k8s.io"]
-      endpoint = ["http://192.168.59.11:5000"]
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."k8s.gcr.io"]
-      endpoint = ["http://192.168.59.11:5000"]
