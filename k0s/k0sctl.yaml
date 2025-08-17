@@ -41,6 +41,15 @@ spec:
     hostname: worker1
     privateAddress: 192.168.59.21
 
+  - ssh:
+      address: 192.168.59.22
+      user: root
+      port: 22
+      keyPath: ~/.ssh/id_rsa
+    role: worker
+    hostname: worker2
+    privateAddress: 192.168.59.22
+
   options:
     wait:
       enabled: true

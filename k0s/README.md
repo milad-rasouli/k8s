@@ -22,3 +22,11 @@ k0sctl apply --config k0sctl.yaml verbose
 k0sctl kubeconfig 
 
 ```
+
+## validate
+
+```sh
+
+k0s config validate --config k0s
+
+```
