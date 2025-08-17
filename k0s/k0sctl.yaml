@@ -8,29 +8,20 @@ spec:
     version: v1.33.3+k0s.0
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
-      kind: Cluster
+      kind: ClusterConfig
       metadata:
-        name: local-k0s
+        name: k0s
       spec:
         api:
-          externalAddress: 192.168.59.10
           address: 192.168.59.10
+          externalAddress: 192.168.59.10
           sans:
             - 192.168.59.10
-          k0sApiPort: 9443
-          port: 6443
         network:
-          provider: kuberouter
-          kubeProxy:
-            disabled: false
-            mode: iptables
-          podCIDR: 172.17.1.0/24
-          serviceCIDR: 172.16.0.0/12
+          provider: calico
         storage:
           type: etcd
-        telemetry:
-          enabled: true
-
+    
   hosts:
   - ssh:
       address: 192.168.59.10
@@ -40,55 +31,6 @@ spec:
     role: controller
     hostname: control1
     privateAddress: 192.168.59.10
-    files:
-      - name: containerd config
-        src: ./resources/etc/k0s/containerd/containerd.toml
-        dstDir: /etc/k0s/
-      - name: containerd registry hosts for docker.io
-        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/docker.io
-      - name: sysctl defaults for k8s
-        src: ./resources/etc/sysctl.d/99-k8s.conf
-        dstDir: /etc/sysctl.d/
-    hooks:
-      prepare:
-        before:
-          - /sbin/modprobe br_netfilter || true
-          - /sbin/sysctl --system || true
-          - systemctl daemon-reload || true
-          - systemctl enable --now k0scontroller || systemctl enable --now k0s || true
-          - systemctl start k0scontroller || systemctl start k0s || true
-          - sleep 2
-          - systemctl status k0scontroller --no-pager -l || systemctl status k0s --no-pager -l || true
-
-  - ssh:
-      address: 192.168.59.22
-      user: root
-      port: 22
-      keyPath: ~/.ssh/id_rsa
-    role: worker
-    hostname: worker1
-    privateAddress: 192.168.59.22
-    files:
-      - name: containerd config
-        src: ./resources/etc/k0s/containerd/containerd.toml
-        dstDir: /etc/k0s/
-      - name: containerd registry hosts for docker.io
-        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/docker.io
-      - name: sysctl defaults for k8s
-        src: ./resources/etc/sysctl.d/99-k8s.conf
-        dstDir: /etc/sysctl.d/
-    hooks:
-      prepare:
-        before:
-          - /sbin/modprobe br_netfilter || true
-          - /sbin/sysctl --system || true
-          - systemctl daemon-reload || true
-          - systemctl enable --now k0sworker || systemctl enable --now k0s || true
-          - systemctl start k0sworker || systemctl start k0s || true
-          - sleep 2
-          - systemctl status k0sworker --no-pager -l || systemctl status k0s --no-pager -l || true
 
   - ssh:
       address: 192.168.59.21
@@ -96,28 +38,8 @@ spec:
       port: 22
       keyPath: ~/.ssh/id_rsa
     role: worker
-    hostname: worker2
+    hostname: worker1
     privateAddress: 192.168.59.21
-    files:
-      - name: containerd config
-        src: ./resources/etc/k0s/containerd/containerd.toml
-        dstDir: /etc/k0s/
-      - name: containerd registry hosts for docker.io
-        src: ./resources/etc/k0s/containerd/certs.d/docker.io/hosts.toml
-        dstDir: /etc/k0s/containerd/certs.d/docker.io
-      - name: sysctl defaults for k8s
-        src: ./resources/etc/sysctl.d/99-k8s.conf
-        dstDir: /etc/sysctl.d/
-    hooks:
-      prepare:
-        before:
-          - /sbin/modprobe br_netfilter || true
-          - /sbin/sysctl --system || true
-          - systemctl daemon-reload || true
-          - systemctl enable --now k0sworker || systemctl enable --now k0s || true
-          - systemctl start k0sworker || systemctl start k0s || true
-          - sleep 2
-          - systemctl status k0sworker --no-pager -l || systemctl status k0s --no-pager -l || true
 
   options:
     wait:
@@ -132,9 +54,9 @@ spec:
       podSelector: ""
       skipWaitForDeleteTimeout: 0s
     concurrency:
-      limit: 10
+      limit: 30
       workerDisruptionPercent: 10
-      uploads: 3
+      uploads: 5
     evictTaint:
       enabled: false
       taint: k0sctl.k0sproject.io/evict=true
