@@ -20,13 +20,11 @@ spec:
         network:
           provider: calico
           calico:
-            mode: bird
+            mode: vxlan
           podCIDR: 10.244.0.0/16
           serviceCIDR: 10.96.0.0/12
           dualStack:
-            enabled: true
-            IPv6podCIDR: fd00::/108
-            IPv6serviceCIDR: fd01::/108
+            enabled: false
         storage:
           type: etcd
   hosts:
@@ -38,6 +36,8 @@ spec:
     role: controller
     hostname: control1
     privateAddress: 192.168.59.10
+    installFlags:
+      - "--node-ip=192.168.59.10"
     # files:
     #   - src: ./resources/etc/k0s/containerd/containerd.toml
     #     dst: /etc/k0s/containerd/containerd.toml
@@ -52,6 +52,8 @@ spec:
     role: worker
     hostname: worker1
     privateAddress: 192.168.59.21
+    installFlags:
+      - "--node-ip=192.168.59.21"
     # files:
     #   - src: ./resources/etc/k0s/containerd/containerd.toml
     #     dst: /etc/k0s/containerd/containerd.toml
@@ -66,6 +68,8 @@ spec:
     role: worker
     hostname: worker2
     privateAddress: 192.168.59.22
+    installFlags:
+      - "--node-ip=192.168.59.22"
     # files:
     #   - src: ./resources/etc/k0s/containerd/containerd.toml
     #     dst: /etc/k0s/containerd/containerd.toml
