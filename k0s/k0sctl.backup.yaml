@@ -1,0 +1,99 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+  user: admin
+spec:
+  k0s:
+    version: v1.33.3+k0s.0
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: ClusterConfig
+      metadata:
+        name: k0s
+      spec:
+        api:
+          address: 192.168.59.10
+          externalAddress: 192.168.59.10
+          sans:
+            - 192.168.59.10
+        network:
+          provider: calico
+          calico:
+            mode: vxlan
+          podCIDR: 10.244.0.0/16
+          serviceCIDR: 10.96.0.0/12
+          dualStack:
+            enabled: false
+        storage:
+          type: etcd
+  hosts:
+  - ssh:
+      address: 192.168.59.10
+      user: root
+      port: 22
+      keyPath: ~/.ssh/id_rsa
+    role: controller
+    hostname: control1
+    privateAddress: 192.168.59.10
+    installFlags:
+      - "--node-ip=192.168.59.10"
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+
+  - ssh:
+      address: 192.168.59.21
+      user: root
+      port: 22
+      keyPath: ~/.ssh/id_rsa
+    role: worker
+    hostname: worker1
+    privateAddress: 192.168.59.21
+    installFlags:
+      - "--node-ip=192.168.59.21"
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+
+  - ssh:
+      address: 192.168.59.22
+      user: root
+      port: 22
+      keyPath: ~/.ssh/id_rsa
+    role: worker
+    hostname: worker2
+    privateAddress: 192.168.59.22
+    installFlags:
+      - "--node-ip=192.168.59.22"
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+
+  options:
+    wait:
+      enabled: true
+    drain:
+      enabled: true
+      gracePeriod: 2m0s
+      timeout: 5m0s
+      force: true
+      ignoreDaemonSets: true
+      deleteEmptyDirData: true
+      podSelector: ""
+      skipWaitForDeleteTimeout: 0s
+    concurrency:
+      limit: 30
+      workerDisruptionPercent: 10
+      uploads: 5
+    evictTaint:
+      enabled: false
+      taint: k0sctl.k0sproject.io/evict=true
+      effect: NoExecute
+      controllerWorkers: false
