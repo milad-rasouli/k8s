@@ -19,9 +19,16 @@ spec:
             - 192.168.59.10
         network:
           provider: calico
+          calico:
+            mode: bird
+          podCIDR: 10.244.0.0/16
+          serviceCIDR: 10.96.0.0/12
+          dualStack:
+            enabled: true
+            IPv6podCIDR: fd00::/108
+            IPv6serviceCIDR: fd01::/108
         storage:
           type: etcd
-    
   hosts:
   - ssh:
       address: 192.168.59.10
@@ -31,6 +38,11 @@ spec:
     role: controller
     hostname: control1
     privateAddress: 192.168.59.10
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
 
   - ssh:
       address: 192.168.59.21
@@ -40,6 +52,11 @@ spec:
     role: worker
     hostname: worker1
     privateAddress: 192.168.59.21
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
 
   - ssh:
       address: 192.168.59.22
@@ -49,6 +66,11 @@ spec:
     role: worker
     hostname: worker2
     privateAddress: 192.168.59.22
+    # files:
+    #   - src: ./resources/etc/k0s/containerd/containerd.toml
+    #     dst: /etc/k0s/containerd/containerd.toml
+    #   - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+    #     dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
 
   options:
     wait:

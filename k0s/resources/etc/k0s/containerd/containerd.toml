@@ -10,13 +10,9 @@ version = 2
   max_concurrent_downloads = 3
   systemd_cgroup = false
 
-  [plugins."io.containerd.grpc.v1.cri".cni]
-    bin_dir = "/opt/cni/bin"
-    conf_dir = "/etc/cni/net.d"
-
   [plugins."io.containerd.grpc.v1.cri".containerd]
     snapshotter = "overlayfs"
 
   [plugins."io.containerd.grpc.v1.cri".registry]
-    # Per-host registry configuration (hosts.toml files) live under this path
-    config_path = "/etc/k0s/containerd/certs.d"
+    # Path to per-host registry configuration (hosts.toml files)
+    config_path = "/etc/containerd/certs.d"
