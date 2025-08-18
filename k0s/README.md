@@ -58,3 +58,10 @@ if encounter any disk limit you can bypass it using this:
         effect: "NoSchedule"
       dnsPolicy: ClusterFirst
 ```
+
+## test the pod
+
+```sh
+curl http://192.227.184.126:30878/
+🟢This is pod default/green-84545c56ff-k448z on linux/amd64, serving / for 10.244.0.1:13497.
+```
