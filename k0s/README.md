@@ -48,3 +48,13 @@ k0s kubectl create deployment green --image jpetazzo/color --replicas 1
 k0s kubectl expose deployment green --port 80 --type NodePort --namespace blue
 
 ```
+
+## disk limit
+if encounter any disk limit you can bypass it using this:
+```sh
+      tolerations:
+      - key: "node.kubernetes.io/disk-pressure"
+        operator: "Exists"
+        effect: "NoSchedule"
+      dnsPolicy: ClusterFirst
+```
