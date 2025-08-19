@@ -45,7 +45,7 @@ sudo ln -s /usr/bin/pigz /usr/bin/unpigz 2>/dev/null || true
 
 ```sh
 k0s kubectl create deployment green --image jpetazzo/color --replicas 1
-k0s kubectl expose deployment green --port 80 --type NodePort --namespace blue
+k0s kubectl expose deployment green --port 80 --type NodePort
 
 ```
 
