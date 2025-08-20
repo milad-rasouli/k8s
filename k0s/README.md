@@ -85,3 +85,13 @@ vboxmanage startvm "worker2" --type headless
 
 
 ```
+
+## Close VMs
+
+```sh
+vboxmanage controlvm "nexus" acpipowerbutton
+vboxmanage controlvm "control1" acpipowerbutton
+vboxmanage controlvm "worker1" acpipowerbutton
+vboxmanage controlvm "worker2" acpipowerbutton
+
+```
