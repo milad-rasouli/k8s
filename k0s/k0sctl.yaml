@@ -28,6 +28,17 @@ spec:
         dst: /etc/k0s/containerd/containerd.toml
       - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
         dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+  - ssh:
+      address: 10.77.67.174
+      user: root
+      port: 22
+      keyPath: ~/.ssh/id_rsa
+    role: worker
+    files:
+      - src: ./resources/etc/k0s/containerd/containerd.toml
+        dst: /etc/k0s/containerd/containerd.toml
+      - src: ./resources/etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
+        dst: /etc/k0s/containerd/certs.d/192.168.59.11:5000/hosts.toml
   options:
     wait:
       enabled: true

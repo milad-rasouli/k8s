@@ -73,3 +73,15 @@ curl http://192.227.184.126:30878/
 ssh-keygen -R 10.77.67.100
 
 ```
+
+## Run VMs
+
+```sh
+
+vboxmanage startvm "nexus" --type headless
+vboxmanage startvm "control1" --type headless
+vboxmanage startvm "worker1" --type headless
+vboxmanage startvm "worker2" --type headless
+
+
+```
