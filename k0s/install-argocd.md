@@ -144,3 +144,9 @@ k0s install controller --single
 k0s start
 ```
 
+## links
+https://www.youtube.com/watch?v=JlVkJhkjSuE&list=PLj6h78yzYM2N9MWCsU_4upn64NDtHGv6i&index=8
+https://github.com/akuity/awesome-argo?tab=readme-ov-file
+https://github.com/argoproj/argo-cd?tab=readme-ov-file
+https://www.youtube.com/playlist?list=PLj6h78yzYM2Ow7Jy0paxwrimeuFGONU_7
+https://kubernetes.io/docs/setup/
